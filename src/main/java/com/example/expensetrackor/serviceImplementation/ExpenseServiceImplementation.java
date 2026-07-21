@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseServiceImplementation implements ExpenseService {
@@ -45,5 +48,27 @@ public class ExpenseServiceImplementation implements ExpenseService {
                 user.getName(),
                 user.getEmail()
         );
+    }
+
+    @Override
+    public List<ExpenseResponseDto> findAllExpenses(Long id) {
+
+        Users user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        List<ExpenseData> expenses = expenseDataRepo.findByUserId(id);
+
+        return expenses.stream()
+                .map(expense -> new ExpenseResponseDto(
+                        expense.getId(),
+                        expense.getAmount(),
+                        expense.getDescription(),
+                        expense.getCategory(),
+                        expense.getStatus(),
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .collect(Collectors.toList());
     }
 }

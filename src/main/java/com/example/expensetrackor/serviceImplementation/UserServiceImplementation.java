@@ -4,12 +4,16 @@ import com.example.expensetrackor.dto.UserRequestDto;
 import com.example.expensetrackor.dto.UserResponseDto;
 import com.example.expensetrackor.model.Users;
 import com.example.expensetrackor.repository.UserRepo;
+import com.example.expensetrackor.service.EmailService;
 import com.example.expensetrackor.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +21,9 @@ import java.util.stream.Collectors;
 public class UserServiceImplementation implements UserService {
 
     private final UserRepo userRepo;
+    private final EmailService emailService;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto findById(Long id) {
@@ -52,6 +59,8 @@ public class UserServiceImplementation implements UserService {
 
     }
 
+
+
     @Override
     public List<UserResponseDto> findAll() {
         List<Users> users = userRepo.findAll();
@@ -63,6 +72,100 @@ public class UserServiceImplementation implements UserService {
                         user.getEmail()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String sendOtp(String email) {
+
+        Users user = userRepo.findByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("User not found.");
+        }
+
+        SecureRandom random = new SecureRandom();
+
+        String otp = String.format("%06d", random.nextInt(1000000));
+
+        user.setOtp(otp);
+
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+        userRepo.save(user);
+
+        emailService.sendOtp(email, otp);
+
+        return "OTP sent successfully.";
+    }
+
+//    @Override
+//    public String verifyOtp(String email, String otp) {
+//
+//        Users user = userRepo.findByEmail(email);
+//
+//        if (user == null) {
+//            throw new RuntimeException("User not found.");
+//        }
+//
+//        if (user.getOtp() == null) {
+//            throw new RuntimeException("Please generate OTP first.");
+//        }
+//
+//        if (!user.getOtp().equals(otp)) {
+//            throw new RuntimeException("Invalid OTP.");
+//        }
+//
+//        if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+//            throw new RuntimeException("OTP has expired.");
+//        }
+//
+//        return "OTP verified successfully.";
+//    }
+
+    @Override
+    public String verifyOtp(String email, String otp) {
+
+        Users user = userRepo.findByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("User not found.");
+        }
+
+        if (user.getOtp() == null) {
+            throw new RuntimeException("Please generate OTP first.");
+        }
+
+        if (!user.getOtp().trim().equals(otp.trim())) {
+            throw new RuntimeException("Invalid OTP.");
+        }
+
+        if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP has expired.");
+        }
+
+        return "OTP verified successfully.";
+    }
+
+    @Override
+    public String resetPassword(String email, String newPassword) {
+
+        System.out.println("Email: " + email);
+        System.out.println("New Password: " + newPassword);
+
+        Users user = userRepo.findByEmail(email);
+
+        System.out.println("User Before: " + user);
+
+        user.setPassword((newPassword));
+
+        System.out.println("Encoded Password: " + user.getPassword());
+
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+
+        userRepo.save(user);
+
+        return "Password changed successfully.";
     }
 
 

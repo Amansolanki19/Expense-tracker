@@ -12,4 +12,11 @@ public interface UserService {
     UserResponseDto findById(Long id);
 
     List<UserResponseDto> findAll();
+
+
+    String sendOtp(String email);
+
+    String verifyOtp(String email, String otp);
+
+    String resetPassword(String email, String newPassword);
 }

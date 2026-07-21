@@ -28,6 +28,10 @@ public class Users {
 
     private LocalDateTime createdAt;
 
+    private String otp;
+
+    private LocalDateTime otpExpiry;
+
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,

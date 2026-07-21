@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/expenseData")
@@ -20,5 +22,10 @@ public class ExpenseDataController {
             @Valid @RequestBody ExpenseRequestDto expenseRequestDto) {
 
         return ResponseEntity.ok(expenseService.createExpense(expenseRequestDto));
+    }
+
+    @GetMapping("/getAll/{id}")
+    public List<ExpenseResponseDto> findAllExpenses(@PathVariable Long id){
+        return expenseService.findAllExpenses(id);
     }
 }

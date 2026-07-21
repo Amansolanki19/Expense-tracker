@@ -1,11 +1,11 @@
 package com.example.expensetrackor.controller;
 
-import com.example.expensetrackor.dto.LoginRequestDto;
-import com.example.expensetrackor.dto.UserRequestDto;
-import com.example.expensetrackor.dto.UserResponseDto;
+import com.example.expensetrackor.dto.*;
+import com.example.expensetrackor.model.Users;
 import com.example.expensetrackor.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +23,30 @@ public class UserController {
             @Valid @RequestBody UserRequestDto user) {
 
         return userService.createUser(user);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        return ResponseEntity.ok(userService.sendOtp(email));
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(@RequestBody VerifyOtpRequest request) {
+        return ResponseEntity.ok(
+                userService.verifyOtp(request.getEmail(), request.getOtp())
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestBody ResetPasswordRequest request) {
+
+        return ResponseEntity.ok(
+                userService.resetPassword(
+                        request.getEmail(),
+                        request.getNewPassword()
+                )
+        );
     }
 
     @GetMapping("find/{id}")
