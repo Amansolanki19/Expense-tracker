@@ -1,18 +1,17 @@
 package com.example.expensetrackor.dto;
 
 import com.example.expensetrackor.model.Status;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ExpenseResponseDto {
 
     private Long id;
+    private String title;
     private Double amount;
     private String description;
     private String category;

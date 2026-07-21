@@ -98,29 +98,6 @@ public class UserServiceImplementation implements UserService {
         return "OTP sent successfully.";
     }
 
-//    @Override
-//    public String verifyOtp(String email, String otp) {
-//
-//        Users user = userRepo.findByEmail(email);
-//
-//        if (user == null) {
-//            throw new RuntimeException("User not found.");
-//        }
-//
-//        if (user.getOtp() == null) {
-//            throw new RuntimeException("Please generate OTP first.");
-//        }
-//
-//        if (!user.getOtp().equals(otp)) {
-//            throw new RuntimeException("Invalid OTP.");
-//        }
-//
-//        if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
-//            throw new RuntimeException("OTP has expired.");
-//        }
-//
-//        return "OTP verified successfully.";
-//    }
 
     @Override
     public String verifyOtp(String email, String otp) {

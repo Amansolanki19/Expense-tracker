@@ -10,4 +10,10 @@ public interface ExpenseService {
 
     List<ExpenseResponseDto> findAllExpenses(Long id);
 
+    ExpenseResponseDto updateService(Long id,ExpenseRequestDto expenseRequestDto);
+
+    void deleteById(Long id);
+
+    void deleteByTitle(String title);
+
 }

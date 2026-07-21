@@ -24,8 +24,31 @@ public class ExpenseDataController {
         return ResponseEntity.ok(expenseService.createExpense(expenseRequestDto));
     }
 
-    @GetMapping("/getAll/{id}")
-    public List<ExpenseResponseDto> findAllExpenses(@PathVariable Long id){
-        return expenseService.findAllExpenses(id);
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id,
+                                                            @Valid @RequestBody ExpenseRequestDto expenseRequestDto){
+        ExpenseResponseDto expenseResponse = expenseService.updateService(id,expenseRequestDto);
+
+        return ResponseEntity.ok(expenseResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteExpenseById(@PathVariable Long id){
+        expenseService.deleteById(id);
+        return ResponseEntity.ok("Expense deleted Successfully");
+    }
+
+    @DeleteMapping("{Title}")
+    public ResponseEntity<String> deleteExpenseByTitle(@PathVariable String title){
+        expenseService.deleteByTitle(title);
+        return ResponseEntity.ok("Expense deleted Successfully");
+    }
+
+
+
+    @GetMapping("/getAll/{userId}")
+    public List<ExpenseResponseDto> findAllExpenses(@PathVariable Long userId){
+        return expenseService.findAllExpenses(userId);
     }
 }

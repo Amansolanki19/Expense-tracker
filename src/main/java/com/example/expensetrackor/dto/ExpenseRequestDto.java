@@ -13,6 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ExpenseRequestDto {
 
+    @NotBlank(message = "Title cannot be blank")
+    private String title;
+
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be greater than Zero")
     private Double amount;

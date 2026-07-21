@@ -36,18 +36,59 @@ public class ExpenseServiceImplementation implements ExpenseService {
                 .user(user)
                 .build();
 
-        ExpenseData savedExpense = expenseDataRepo.save(expense);
+        ExpenseData expenseData = expenseDataRepo.save(expense);
 
-        return new ExpenseResponseDto(
-                savedExpense.getId(),
-                savedExpense.getAmount(),
-                savedExpense.getDescription(),
-                savedExpense.getCategory(),
-                savedExpense.getStatus(),
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
+        return ExpenseResponseDto.builder()
+                .id(expenseData.getId())
+                .title(expenseData.getTitle())
+                .amount(expenseData.getAmount())
+                .description(expenseData.getDescription())
+                .category(expenseData.getCategory())
+                .status(expenseData.getStatus())
+                .build();
+
+    }
+
+    @Override
+    public ExpenseResponseDto updateService(Long id, ExpenseRequestDto expenseRequestDto) {
+        ExpenseData expenseData = expenseDataRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        expenseData.setAmount(expenseRequestDto.getAmount());
+        expenseData.setDescription(expenseRequestDto.getDescription());
+        expenseData.setCategory(expenseRequestDto.getCategory());
+        expenseData.setStatus(expenseRequestDto.getStatus());
+        expenseData.setTitle(expenseRequestDto.getTitle());
+
+        expenseData = expenseDataRepo.save(expenseData);
+
+        return ExpenseResponseDto.builder()
+                .id(expenseData.getId())
+                .title(expenseData.getTitle())
+                .amount(expenseData.getAmount())
+                .description(expenseData.getDescription())
+                .category(expenseData.getCategory())
+                .status(expenseData.getStatus())
+                .build();
+    }
+
+    @Override
+    public void deleteByTitle(String title) {
+        if (!expenseDataRepo.findByTitle(title)){
+            throw new RuntimeException("Expense with title: "+title+" not found");
+        }
+
+        expenseDataRepo.deleteByTitle(title);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
+        if (!expenseDataRepo.existsById(id)) {
+            throw new RuntimeException("Expense not found with id: " + id);
+        }
+
+        expenseDataRepo.deleteById(id);
     }
 
     @Override
@@ -59,16 +100,16 @@ public class ExpenseServiceImplementation implements ExpenseService {
         List<ExpenseData> expenses = expenseDataRepo.findByUserId(id);
 
         return expenses.stream()
-                .map(expense -> new ExpenseResponseDto(
-                        expense.getId(),
-                        expense.getAmount(),
-                        expense.getDescription(),
-                        expense.getCategory(),
-                        expense.getStatus(),
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail()
-                ))
+                .map(expense -> ExpenseResponseDto.builder()
+                        .id(expense.getId())
+                        .amount(expense.getAmount())
+                        .description(expense.getDescription())
+                        .category(expense.getCategory())
+                        .status(expense.getStatus())
+                        .userId(user.getId())
+                        .userName(user.getName())
+                        .userEmail(user.getEmail())
+                        .build())
                 .collect(Collectors.toList());
     }
 }
